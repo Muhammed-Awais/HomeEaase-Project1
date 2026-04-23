@@ -33,8 +33,6 @@ const queryDatabase = async (filters) => {
 
     if (filters.bedrooms) query.bedrooms = parseInt(filters.bedrooms);
     if (filters.city) query.city = new RegExp(filters.city, "i");
-    if (filters.type) query.type = new RegExp(filters.type, "i");
-    if (filters.purpose) query.purpose = new RegExp(filters.purpose, "i");
     if (filters.furnishing) query.furnishing = new RegExp(filters.furnishing, "i");
     if (filters.floor) query.floor = new RegExp(filters.floor, "i");
 
@@ -79,69 +77,27 @@ const queryDatabase = async (filters) => {
 const SYSTEM_PROMPT = `You are **HomeEase AI**, a professional and concise real estate assistant for the HomeEase property app in Pakistan.
 
 ### RULES:
-1. **Scope**: You ONLY answer questions related to the HomeEase app — property search, rent, buy, listings, pricing, amenities, property types, and general real estate guidance in Pakistan.
+1. **Scope**: You ONLY answer questions related to the HomeEase app — property search, rent, listings, pricing, amenities, property types, and general real estate guidance in Pakistan.
 2. **Off-topic**: If the user asks anything unrelated to real estate or the HomeEase app, politely decline in ONE short sentence. Example: "I can only assist with property-related queries on HomeEase."
-3. **Greetings**: If the user greets you (hi, hello, hey, salam, etc.), welcome them warmly and briefly mention you can help with property search.
+3. **Greetings & Thanks**: If the user greets you or says thanks, reply politely and conversationally without treating it as off-topic. Briefly mention you can help with renting properties.
 4. **Concise**: Keep every answer short and direct. No bullet lists unless the user asks for multiple items. No follow-up questions — just answer and stop.
-5. **Tool Usage**: When the user asks about properties or listings, call the searchProperties tool ONCE. After receiving the tool result, immediately write your text reply — NEVER call searchProperties more than once per user message.
+5. **Tool Usage**: ONLY call the searchProperties tool when the user explicitly asks to find, search, or filter properties. DO NOT call the tool for conversational messages (like greetings, thanks, or small talk). When you do need to search, ALWAYS call it even if you already called it in a previous message. Do not rely on past tool results to answer new queries. After receiving the tool result, immediately write your text reply — NEVER call searchProperties more than once per user message.
 6. **No Results**: If the tool returns 0 results, say so in one sentence. Do not suggest alternatives unless asked.
 7. **Identity**: You are HomeEase AI. Never mention Groq, LLaMA, Meta, or any AI model names. If asked what you are, say "I am HomeEase AI, your property assistant."
 8. **Language**: Always respond in English.
-9. **Property Type Synonyms**: Map user terminology to the correct propertyType before calling the tool:
-   - "home", "homes", "house", "houses", "bungalow", "villa", "makan" → house
-   - "flat", "flats" → flat
-   - "apartment", "apartments", "apt" → apartment
-   - "room", "rooms", "kamra" → room
-   - "portion", "portions" → portion
-   - "studio", "studios" → studio
-   - "plot", "plots", "land" → plot
-   - "shop", "shops", "dukan" → shop
-   - "office", "offices" → office
-   If the user says anything above you can still call the tool with the normalized propertyType (e.g. "house") to get correct results you can show data about the properties.`;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Property type synonym normalizer
-// ─────────────────────────────────────────────────────────────────────────────
-
-const PROPERTY_TYPE_SYNONYMS = {
-  house: ["home", "homes", "houses", "bungalow", "bungalows", "villa", "villas", "makan"],
-  flat: ["flats"],
-  apartment: ["apartments", "apt", "apts"],
-  room: ["rooms", "kamra"],
-  portion: ["portions"],
-  studio: ["studios"],
-  plot: ["plots", "land"],
-  shop: ["shops", "dukan"],
-  office: ["offices"],
-};
-
-const synonymToCanonical = (() => {
-  const map = {};
-  for (const [canonical, aliases] of Object.entries(PROPERTY_TYPE_SYNONYMS)) {
-    map[canonical] = canonical;
-    for (const alias of aliases) map[alias] = canonical;
-  }
-  return map;
-})();
-
-function normalizePropertyType(raw) {
-  if (!raw) return undefined;
-  return synonymToCanonical[raw.toLowerCase().trim()] ?? raw.toLowerCase().trim();
-}
+9. **Rent Only Platform**: HomeEase is STRICTLY for RENTING properties. NEVER mention buying, selling, or sales in your responses. If the user asks to buy a property, politely inform them that HomeEase only supports rentals.`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tool schema defined with Zod (required for correct Groq function calling)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const searchPropertiesSchema = z.object({
-  city: z.string().optional().describe("City name, e.g. Lahore, Karachi, Islamabad, Faisalabad"),
-  propertyType: z.string().optional().describe("Property type: flat, apartment, house, room, portion, studio, plot, shop, or office"),
-  bedrooms: z.number().optional().describe("Number of bedrooms"),
-  bathrooms: z.number().optional().describe("Number of bathrooms"),
-  budget: z.number().optional().describe("Maximum budget/price in PKR"),
-  minPrice: z.number().optional().describe("Minimum price in PKR"),
-  purpose: z.string().optional().describe("Purpose: rent, buy, or sale"),
-  furnishing: z.string().optional().describe("Furnishing: furnished, semi-furnished, or unfurnished"),
+  city: z.string().optional().describe("City name, e.g. Lahore, Karachi. Include only if user mentions it."),
+  bedrooms: z.number().optional().describe("Number of bedrooms. Include only if user explicitly asks for a specific number."),
+  bathrooms: z.number().optional().describe("Number of bathrooms. Include only if explicitly requested."),
+  budget: z.number().optional().describe("Maximum budget/price in PKR. Include only if user gives a max price."),
+  minPrice: z.number().optional().describe("Minimum price in PKR. Include only if user gives a min price."),
+  furnishing: z.string().optional().describe("Furnishing: furnished, semi-furnished, or unfurnished. Include only if specified."),
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -160,12 +116,10 @@ const processChatMessage = async (message, history = []) => {
       execute: async (params) => {
         const filters = {};
         if (params.city) filters.city = params.city;
-        if (params.propertyType) filters.type = normalizePropertyType(params.propertyType);
         if (params.bedrooms) filters.bedrooms = params.bedrooms;
         if (params.bathrooms) filters.bathrooms = params.bathrooms;
         if (params.budget) filters.maxPrice = params.budget;
         if (params.minPrice) filters.minPrice = params.minPrice;
-        if (params.purpose) filters.purpose = params.purpose;
         if (params.furnishing) filters.furnishing = params.furnishing;
 
         console.log("[Tool Call] searchProperties:", JSON.stringify(filters));
@@ -205,7 +159,7 @@ const processChatMessage = async (message, history = []) => {
     ];
 
     const result = await generateText({
-      model: groq("llama-3.3-70b-versatile"),
+      model: groq("llama-3.1-8b-instant"),
       system: SYSTEM_PROMPT,
       messages,
       tools: { searchProperties: searchPropertiesTool },

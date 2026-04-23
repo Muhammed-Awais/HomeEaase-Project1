@@ -323,7 +323,6 @@ export const STYLE_PRESETS: StylePreset[] = [
 
 export const SUGGESTION_CHIPS = [
   "2BHK in Lahore",
-  "Under 50k PKR",
   "With parking",
   "Near university",
   "Furnished",

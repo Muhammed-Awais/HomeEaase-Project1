@@ -1,9 +1,7 @@
 import ChatInput from "@/components/chat/ChatInput";
 import MessageBubble from "@/components/chat/MessageBubble";
 import PropertyResultCard from "@/components/chat/PropertyResultCard";
-import SuggestionChips from "@/components/chat/SuggestionChips";
 import TypingIndicator from "@/components/chat/TypingIndicator";
-import { SUGGESTION_CHIPS } from "@/constants/mockData";
 import { fonts, fontSize, spacing } from "@/constants/theme";
 import { Message } from "@/constants/types";
 import { useAuth } from "@/context/AuthContext";
@@ -22,7 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const WELCOME_MESSAGE: Message = {
   id: "welcome",
-  text: "Hello! I'm HomeEase AI. I can help you find properties to rent or buy across Pakistan. What are you looking for?",
+  text: "Hello! I'm HomeEase AI. I can help you find properties to rent across Pakistan. What are you looking for?",
   sender: "bot",
   timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
 };
@@ -87,10 +85,6 @@ export default function ChatScreen() {
     }
   };
 
-  const handleSuggestion = (text: string) => {
-    handleSend(text);
-  };
-
   const renderMessage = ({ item }: { item: Message }) => (
     <View>
       <MessageBubble text={item.text} sender={item.sender} />
@@ -120,7 +114,7 @@ export default function ChatScreen() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={90}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         <FlatList
           ref={flatListRef}
@@ -135,10 +129,6 @@ export default function ChatScreen() {
           ListFooterComponent={isTyping ? <TypingIndicator /> : null}
         />
 
-        <SuggestionChips
-          suggestions={SUGGESTION_CHIPS}
-          onSelect={handleSuggestion}
-        />
         <ChatInput onSend={handleSend} />
       </KeyboardAvoidingView>
     </SafeAreaView>

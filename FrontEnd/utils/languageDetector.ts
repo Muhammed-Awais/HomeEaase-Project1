@@ -36,16 +36,16 @@ export const detectLanguage = (message: string): 'english' | 'urdu' | 'hinglish'
  * Language-aware refusal messages for off-topic queries.
  */
 export const REFUSAL_MESSAGES = {
-  english: "I'm sorry! I can only help with property-related questions on the HomeEase app. Please ask me about flats, houses, rent, or buying properties in Pakistan!",
-  urdu: "معذرت! میں صرف HomeEase ایپ پر پراپرٹی سے متعلق سوالوں میں مدد کر سکتا ہوں۔ براہ کرم مجھ سے فلیٹس، گھر، کرایہ یا پراپرٹی خریدنے کے بارے میں پوچھیں!",
-  hinglish: "Mujhe maafi chahiye! Main sirf HomeEase app par property se related sawaalon mein madad kar sakta hoon. Kripya mujhse flats, ghar, kiraya, ya property khareedne ke baare mein poochein!"
+  english: "I'm sorry! I can only help with property-related questions on the HomeEase app. Please ask me about flats, houses, or rent in Pakistan!",
+  urdu: "معذرت! میں صرف HomeEase ایپ پر پراپرٹی سے متعلق سوالوں میں مدد کر سکتا ہوں۔ براہ کرم مجھ سے فلیٹس، گھر، یا کرایہ کے بارے میں پوچھیں!",
+  hinglish: "Mujhe maafi chahiye! Main sirf HomeEase app par property se related sawaalon mein madad kar sakta hoon. Kripya mujhse flats, ghar, ya kiraya ke baare mein poochein!"
 };
 
 /**
  * Language-aware welcome messages.
  */
 export const WELCOME_MESSAGES = {
-  english: "Asalaam-o-Alaikum! I am HomeEase AI, your personal property assistant. Tell me — which city, how many rooms, what's your budget, and are you looking for rent or buy? I'll find the best options for you right away!",
-  urdu: "اسلام علیکم! میں ہوم ایز اے آئی ہوں، آپ کا پرسنل پراپرٹی اسسٹنٹ۔ مجھے بتائیں — کونسا شہر، کتنے کمرے، کتنا بجٹ، اور کرایہ چاہیے یا خریدنا ہے؟ میں ابھی بہترین آپشنز ڈھونڈ کر دیتا ہوں!",
-  hinglish: "Asalaam-o-Alaikum! Main HomeEase AI hoon, aapka personal property assistant. Mujhe batayein — kaunsa sheher, kitne kamre, budget kitna hai, aur kiraya chahiye ya khareedna? Main abhi best options dhundh kar deta hoon!"
+  english: "Asalaam-o-Alaikum! I am HomeEase AI, your personal property assistant. Tell me — which city, how many rooms, and what's your budget? I'll find the best rental options for you right away!",
+  urdu: "اسلام علیکم! میں ہوم ایز اے آئی ہوں، آپ کا پرسنل پراپرٹی اسسٹنٹ۔ مجھے بتائیں — کونسا شہر، کتنے کمرے، اور کتنا بجٹ؟ میں ابھی بہترین آپشنز ڈھونڈ کر دیتا ہوں!",
+  hinglish: "Asalaam-o-Alaikum! Main HomeEase AI hoon, aapka personal property assistant. Mujhe batayein — kaunsa sheher, kitne kamre, aur budget kitna hai? Main abhi best options dhundh kar deta hoon!"
 };
