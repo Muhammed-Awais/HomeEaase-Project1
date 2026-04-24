@@ -45,6 +45,7 @@ export default function ProfileScreen() {
       icon: <Bell size={22} color={colors.accent} />,
       label: "Notifications",
       onPress: () => router.push("/notifications"),
+      role: "renter",
     },
     {
       icon: <Heart size={22} color={colors.accent} />,

@@ -52,6 +52,11 @@ const UserSchema = new mongoose.Schema({
     enum: ['renter', 'landlord'],
     default: 'renter',
   },
+  city: {
+    type: String,
+    trim: true,
+    default: '',
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
 });

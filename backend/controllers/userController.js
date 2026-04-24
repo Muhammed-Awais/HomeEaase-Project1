@@ -12,7 +12,16 @@ exports.getMe = async (req, res, next) => {
     }
     res.status(200).json({
       success: true,
-      data: user,
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        contactNo: user.contactNo,
+        role: user.role,
+        avatar: user.avatar,
+        favorites: user.favorites,
+        city: user.city || '',
+      },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -24,12 +33,13 @@ exports.getMe = async (req, res, next) => {
 // @access  Private
 exports.updateProfile = async (req, res, next) => {
   try {
-    const { name, contactNo } = req.body;
+    const { name, contactNo, city } = req.body;
 
     // We do not update passwords via this route
     const userFields = {
       name,
       contactNo,
+      ...(city !== undefined ? { city } : {}),
     };
 
     if (req.file) {
@@ -54,6 +64,7 @@ exports.updateProfile = async (req, res, next) => {
         contactNo: updatedUser.contactNo,
         role: updatedUser.role,
         avatar: updatedUser.avatar,
+        city: updatedUser.city || '',
       },
     });
   } catch (error) {

@@ -8,7 +8,7 @@ import axios from "axios";
 //
 // Current IP: 192.168.18.152  (run `ipconfig` again if your IP changes)
 // ─────────────────────────────────────────────────────────────────────────────
-export const BASE_URL = "http://192.168.0.111:5000";
+export const BASE_URL = "http://192.168.18.152:5000";
 
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,

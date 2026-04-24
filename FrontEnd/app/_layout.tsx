@@ -17,6 +17,7 @@ import Toast, { BaseToast, ErrorToast, ToastConfig } from "react-native-toast-me
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
 import { SearchProvider } from "../context/SearchContext";
+import { NotificationProvider } from "../context/NotificationContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -175,9 +176,11 @@ export default function RootLayout() {
     <ThemeProvider>
       <AuthProvider>
         <SearchProvider>
-          <AuthGuard>
-            <ThemeAwareApp />
-          </AuthGuard>
+          <NotificationProvider>
+            <AuthGuard>
+              <ThemeAwareApp />
+            </AuthGuard>
+          </NotificationProvider>
         </SearchProvider>
       </AuthProvider>
     </ThemeProvider>

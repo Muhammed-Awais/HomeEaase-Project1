@@ -1,4 +1,6 @@
 const Property = require('../models/Property');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 const cloudinary = require('cloudinary').v2;
 
 // @desc    Create new property
@@ -40,6 +42,36 @@ exports.createProperty = async (req, res, next) => {
       success: true,
       message: 'Property created successfully',
       data: property,
+    });
+
+    // ── Notify all renters in the same city (async, non-blocking) ──
+    setImmediate(async () => {
+      try {
+        const cityRegex = new RegExp(`^${property.city.trim()}$`, 'i');
+        const renters = await User.find({
+          role: 'renter',
+          city: cityRegex,
+          isVerified: true,
+        }).select('_id').lean();
+
+        if (renters.length > 0) {
+          const notifications = renters.map((renter) => ({
+            userId: renter._id,
+            title: `New Property in ${property.city} 🏠`,
+            body: `A new ${property.type || 'property'} "${property.title}" has just been listed in ${property.city} for PKR ${property.price.toLocaleString()}/mo.`,
+            type: 'property',
+            propertyId: property._id,
+            read: false,
+          }));
+
+          await Notification.insertMany(notifications);
+          console.log(`[Notify] Created ${notifications.length} notifications for renters in ${property.city}`);
+        } else {
+          console.log(`[Notify] No renters found in city: ${property.city}`);
+        }
+      } catch (notifyErr) {
+        console.error('[Notify Error]', notifyErr.message);
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

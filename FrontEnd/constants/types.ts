@@ -34,12 +34,15 @@ export interface Message {
 }
 
 export interface Notification {
-  id: string;
+  _id: string;
+  id?: string; // alias for _id (frontend compat)
   title: string;
   body: string;
   type: "message" | "property" | "system";
   read: boolean;
-  timestamp: string;
+  propertyId?: string;
+  createdAt: string;
+  timestamp?: string; // formatted display string
 }
 
 export interface User {
@@ -50,6 +53,7 @@ export interface User {
   avatar?: string;
   contactNo?: string;
   favorites?: string[];
+  city?: string; // renters only
 }
 
 export interface Filter {

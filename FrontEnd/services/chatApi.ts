@@ -14,7 +14,7 @@ export const sendChatMessage = async (
     message,
     userId,
     conversationHistory,
-  });
+  }, { timeout: 60000 }); // 60s — LLM calls can take time
   return response.data;
 };
 

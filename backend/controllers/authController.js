@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 // @access  Public
 exports.signup = async (req, res, next) => {
   try {
-    const { name, email, password, contactNo, role } = req.body;
+    const { name, email, password, contactNo, role, city } = req.body;
 
     // Check if user already exists
     let user = await User.findOne({ email });
@@ -23,6 +23,7 @@ exports.signup = async (req, res, next) => {
       password,
       contactNo,
       role,
+      city: role === 'renter' ? (city || '') : '',
     });
 
     const otp = user.generateVerificationToken();
@@ -145,6 +146,7 @@ exports.login = async (req, res, next) => {
         role: user.role,
         avatar: user.avatar,
         contactNo: user.contactNo,
+        city: user.city || '',
       },
     });
   } catch (error) {

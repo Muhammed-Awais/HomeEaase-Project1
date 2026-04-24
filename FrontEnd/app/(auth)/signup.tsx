@@ -1,7 +1,7 @@
 import { fonts, fontSize, radius, spacing } from "@/constants/theme";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
+import { ArrowLeft, MapPin } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -19,6 +19,12 @@ import AuthButton from "@/components/auth/AuthButton";
 import AuthInput from "@/components/auth/AuthInput";
 import { useTheme } from "@/context/ThemeContext";
 
+const PAKISTAN_CITIES = [
+  "Karachi", "Lahore", "Islamabad", "Rawalpindi", "Faisalabad",
+  "Multan", "Peshawar", "Quetta", "Hyderabad", "Sialkot",
+  "Gujranwala", "Bahawalpur", "Sargodha", "Abbottabad", "Sukkur",
+];
+
 export default function SignupScreen() {
   const { colors } = useTheme();
   const styles = createStyles(colors);
@@ -29,6 +35,8 @@ export default function SignupScreen() {
   const [contactNo, setContactNo] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"renter" | "landlord">("renter");
+  const [city, setCity] = useState("");
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
 
   const handleSignup = async () => {
     if (!name.trim() || !email.trim() || !password.trim() || !contactNo.trim()) {
@@ -36,6 +44,14 @@ export default function SignupScreen() {
         type: "error",
         text1: "Missing Fields",
         text2: "Please fill in all fields.",
+      });
+      return;
+    }
+    if (role === "renter" && !city.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "City Required",
+        text2: "Please select your city to receive property alerts.",
       });
       return;
     }
@@ -47,9 +63,15 @@ export default function SignupScreen() {
       });
       return;
     }
-    const success = await signup(name.trim(), email.trim(), password, contactNo.trim(), role);
+    const success = await signup(
+      name.trim(),
+      email.trim(),
+      password,
+      contactNo.trim(),
+      role,
+      role === "renter" ? city.trim() : undefined
+    );
     if (success) {
-      // Navigate to OTP verification screen, passing email as a param
       router.push({
         pathname: "/(auth)/verify-otp",
         params: { email: email.trim() },
@@ -86,7 +108,10 @@ export default function SignupScreen() {
             <View style={styles.rolePills}>
               <TouchableOpacity
                 style={[styles.rolePill, role === "renter" && styles.rolePillActive]}
-                onPress={() => setRole("renter")}
+                onPress={() => {
+                  setRole("renter");
+                  setCity("");
+                }}
               >
                 <Text
                   style={[styles.rolePillText, role === "renter" && styles.rolePillTextActive]}
@@ -96,7 +121,10 @@ export default function SignupScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.rolePill, role === "landlord" && styles.rolePillActive]}
-                onPress={() => setRole("landlord")}
+                onPress={() => {
+                  setRole("landlord");
+                  setCity("");
+                }}
               >
                 <Text
                   style={[styles.rolePillText, role === "landlord" && styles.rolePillTextActive]}
@@ -137,6 +165,61 @@ export default function SignupScreen() {
               onChangeText={setPassword}
               secureTextEntry
             />
+
+            {/* City Selector — renters only */}
+            {role === "renter" && (
+              <View style={styles.cityContainer}>
+                <Text style={styles.cityLabel}>Your City</Text>
+                <Text style={styles.cityHint}>
+                  🔔 You'll get alerts when new properties are listed in your city
+                </Text>
+                <TouchableOpacity
+                  style={[styles.citySelector, showCityDropdown && styles.citySelectorActive]}
+                  onPress={() => setShowCityDropdown(!showCityDropdown)}
+                  activeOpacity={0.8}
+                >
+                  <MapPin size={16} color={city ? colors.accent : colors.textTertiary} strokeWidth={1.8} />
+                  <Text style={[styles.citySelectorText, !city && styles.citySelectorPlaceholder]}>
+                    {city || "Select your city"}
+                  </Text>
+                  <Text style={styles.dropdownArrow}>{showCityDropdown ? "▲" : "▼"}</Text>
+                </TouchableOpacity>
+
+                {showCityDropdown && (
+                  <View style={[styles.dropdown, { backgroundColor: colors.surface }]}>
+                    <ScrollView
+                      style={{ maxHeight: 200 }}
+                      showsVerticalScrollIndicator={false}
+                      nestedScrollEnabled
+                      keyboardShouldPersistTaps="handled"
+                    >
+                      {PAKISTAN_CITIES.map((c) => (
+                        <TouchableOpacity
+                          key={c}
+                          style={[
+                            styles.dropdownItem,
+                            city === c && styles.dropdownItemActive,
+                          ]}
+                          onPress={() => {
+                            setCity(c);
+                            setShowCityDropdown(false);
+                          }}
+                        >
+                          <Text
+                            style={[
+                              styles.dropdownItemText,
+                              city === c && styles.dropdownItemTextActive,
+                            ]}
+                          >
+                            {c}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
+            )}
 
             {isLoading ? (
               <ActivityIndicator
@@ -232,6 +315,81 @@ const createStyles = (colors: any) => StyleSheet.create({
     color: colors.accentDark,
   },
   form: {},
+  // ── City Selector ────────────────────────────────────────────────────────
+  cityContainer: {
+    marginBottom: spacing.lg,
+  },
+  cityLabel: {
+    fontFamily: fonts.bodyMedium,
+    fontSize: fontSize.sm,
+    color: colors.text,
+    marginBottom: 4,
+    letterSpacing: 0.3,
+  },
+  cityHint: {
+    fontFamily: fonts.body,
+    fontSize: fontSize.xs,
+    color: colors.accent,
+    marginBottom: spacing.sm,
+    lineHeight: 16,
+  },
+  citySelector: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingHorizontal: spacing.base,
+    paddingVertical: 14,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  citySelectorActive: {
+    borderColor: colors.accent,
+  },
+  citySelectorText: {
+    flex: 1,
+    fontFamily: fonts.body,
+    fontSize: fontSize.base,
+    color: colors.text,
+  },
+  citySelectorPlaceholder: {
+    color: colors.textTertiary,
+  },
+  dropdownArrow: {
+    fontSize: 10,
+    color: colors.textTertiary,
+  },
+  dropdown: {
+    marginTop: 4,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    overflow: "hidden",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  dropdownItem: {
+    paddingHorizontal: spacing.base,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  dropdownItemActive: {
+    backgroundColor: colors.accentLight,
+  },
+  dropdownItemText: {
+    fontFamily: fonts.body,
+    fontSize: fontSize.base,
+    color: colors.text,
+  },
+  dropdownItemTextActive: {
+    color: colors.accent,
+    fontFamily: fonts.bodySemiBold,
+  },
   footer: {
     flexDirection: "row",
     justifyContent: "center",

@@ -1,4 +1,3 @@
-import FilterChips from "@/components/browse/FilterChips";
 import PropertyCard from "@/components/browse/PropertyCard";
 import SearchBar from "@/components/browse/SearchBar";
 import ViewToggle from "@/components/browse/ViewToggle";
@@ -26,7 +25,6 @@ export default function BrowseScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const [search, setSearch] = useState("");
-  const [selectedChip, setSelectedChip] = useState("All");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   
   const [properties, setProperties] = useState<any[]>([]);
@@ -63,7 +61,9 @@ export default function BrowseScreen() {
     if (search) {
       const q = search.toLowerCase();
       return (
-        p.title.toLowerCase().includes(q) || p.location?.toLowerCase().includes(q)
+        p.title?.toLowerCase().includes(q) || 
+        p.location?.toLowerCase().includes(q) || 
+        p.city?.toLowerCase().includes(q)
       );
     }
     return true;
@@ -83,8 +83,6 @@ export default function BrowseScreen() {
           onFilterPress={() => router.push("/search")}
         />
       </View>
-
-      <FilterChips selected={selectedChip} onSelect={setSelectedChip} />
 
       {isLoading ? (
         <View style={styles.center}>

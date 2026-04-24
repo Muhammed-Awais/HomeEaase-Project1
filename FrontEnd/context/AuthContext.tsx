@@ -13,13 +13,14 @@ interface User {
   avatar?: string;
   contactNo?: string;
   favorites?: string[];
+  city?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  signup: (name: string, email: string, password: string, contactNo: string, role: string) => Promise<boolean>;
+  signup: (name: string, email: string, password: string, contactNo: string, role: string, city?: string) => Promise<boolean>;
   verifyEmail: (email: string, otp: string) => Promise<boolean>;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
@@ -72,6 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 avatar: freshUser.avatar,
                 contactNo: freshUser.contactNo,
                 favorites: freshUser.favorites,
+                city: freshUser.city || '',
               };
               setUser(normalizedUser);
               await AsyncStorage.setItem("authUser", JSON.stringify(normalizedUser));
@@ -105,11 +107,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     email: string,
     password: string,
     contactNo: string,
-    role: string
+    role: string,
+    city?: string
   ): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response = await api.post("/auth/signup", { name, email, password, contactNo, role });
+      const response = await api.post("/auth/signup", { name, email, password, contactNo, role, city });
       if (response.data.success) {
         Toast.show({
           type: "success",
