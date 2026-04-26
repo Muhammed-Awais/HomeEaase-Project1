@@ -104,7 +104,7 @@ export default function ImageUploader({
           <ImageIcon size={22} color={colors.accent} strokeWidth={1.8} />
         </View>
       </View>
-      <Text style={styles.title}>Upload a Room Photo</Text>
+      <Text style={styles.title}>Upload Living Room Photo</Text>
       <Text style={styles.subtitle}>
         Take a photo or choose from gallery
       </Text>

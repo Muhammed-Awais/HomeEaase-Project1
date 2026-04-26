@@ -45,7 +45,7 @@ export default function StudioScreen() {
 
   const handleGenerate = async () => {
     if (!uploadedImageUri) {
-      Alert.alert("No Photo", "Please upload a room photo first.");
+      Alert.alert("No Photo", "Please upload a living room photo first.");
       return;
     }
 
@@ -74,7 +74,7 @@ export default function StudioScreen() {
     if (!resultImageBase64) return;
 
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
+      const { status } = await MediaLibrary.requestPermissionsAsync(true);
       if (status !== "granted") {
         Alert.alert(
           "Permission Denied",
@@ -83,17 +83,34 @@ export default function StudioScreen() {
         return;
       }
 
-      const base64Data = resultImageBase64.split(",")[1];
-      const fileUri = `${FileSystem.documentDirectory}transformed_room_${Date.now()}.jpg`;
+      const commaIndex = resultImageBase64.indexOf(",");
+      const base64Data =
+        commaIndex !== -1
+          ? resultImageBase64.slice(commaIndex + 1)
+          : resultImageBase64;
+
+      const dir =
+        FileSystem.cacheDirectory ?? FileSystem.documentDirectory ?? "";
+      if (!dir) {
+        Alert.alert("Error", "Storage directory unavailable on this device.");
+        return;
+      }
+
+      const fileUri = `${dir}transformed_room_${Date.now()}.png`;
 
       await FileSystem.writeAsStringAsync(fileUri, base64Data, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      await MediaLibrary.saveToLibraryAsync(fileUri);
+      const asset = await MediaLibrary.createAssetAsync(fileUri);
+      await MediaLibrary.createAlbumAsync("HomeEaase", asset, false);
+
       Alert.alert("Saved!", "Transformed image saved to your gallery.");
-    } catch {
-      Alert.alert("Error", "Failed to save image. Please try again.");
+    } catch (err: any) {
+      Alert.alert(
+        "Error",
+        err?.message ?? "Failed to save image. Please try again."
+      );
     }
   };
 
