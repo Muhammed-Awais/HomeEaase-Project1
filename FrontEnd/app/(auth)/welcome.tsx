@@ -1,7 +1,7 @@
 import { fonts, fontSize, spacing } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View, Text } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -53,9 +53,13 @@ export default function WelcomeScreen() {
           onPress={() => router.push("/(auth)/login")}
           style={{ marginTop: spacing.md }}
         />
-        <Animated.Text style={styles.terms}>
-          By continuing, you agree to our Terms & Privacy Policy
-        </Animated.Text>
+        <View style={styles.taglineContainer}>
+          <Text>
+            <Text style={styles.terms}>Smart Living, Powered by </Text>
+            <Text style={styles.highlightA}>A</Text>
+            <Text style={styles.darkA}>&A</Text>
+          </Text>
+        </View>
       </Animated.View>
     </SafeAreaView>
   );
@@ -74,12 +78,26 @@ const createStyles = (colors: any) => StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing["2xl"],
   },
+  taglineContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: spacing.lg,
+  },
   terms: {
     fontFamily: fonts.body,
     fontSize: fontSize.xs,
     color: colors.textTertiary,
     textAlign: "center",
-    marginTop: spacing.lg,
-    lineHeight: 16,
+  },
+  highlightA: {
+    fontFamily: fonts.bodyBold,
+    fontSize: fontSize.sm,
+    color: colors.accent, // Warm accent color for the first A
+  },
+  darkA: {
+    fontFamily: fonts.bodyBold,
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
   },
 });

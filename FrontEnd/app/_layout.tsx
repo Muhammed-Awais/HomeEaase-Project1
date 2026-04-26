@@ -11,9 +11,10 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { CheckCircle, AlertCircle } from "lucide-react-native";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import Toast, { BaseToast, ErrorToast, ToastConfig } from "react-native-toast-message";
+import AnimatedSplashScreen from "../components/AnimatedSplashScreen";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
 import { SearchProvider } from "../context/SearchContext";
@@ -161,6 +162,8 @@ export default function RootLayout() {
     Outfit_600SemiBold,
     Outfit_700Bold,
   });
+  
+  const [appReady, setAppReady] = useState(false);
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -177,9 +180,13 @@ export default function RootLayout() {
       <AuthProvider>
         <SearchProvider>
           <NotificationProvider>
-            <AuthGuard>
-              <ThemeAwareApp />
-            </AuthGuard>
+            {!appReady ? (
+              <AnimatedSplashScreen onComplete={() => setAppReady(true)} />
+            ) : (
+              <AuthGuard>
+                <ThemeAwareApp />
+              </AuthGuard>
+            )}
           </NotificationProvider>
         </SearchProvider>
       </AuthProvider>

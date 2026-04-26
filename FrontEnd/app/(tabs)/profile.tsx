@@ -53,11 +53,6 @@ export default function ProfileScreen() {
       onPress: () => router.push("/favorites"),
     },
     {
-      icon: <Shield size={22} color={colors.accent} />,
-      label: "Privacy & Security",
-      onPress: () => {},
-    },
-    {
       icon: <Settings size={22} color={colors.accent} />,
       label: "Settings",
       onPress: () => router.push("/settings"),

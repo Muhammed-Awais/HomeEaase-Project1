@@ -135,6 +135,6 @@ const createStyles = (colors: any, isSelected: boolean = false) => StyleSheet.cr
     color: colors.text,
   },
   textUser: {
-    color: "#FFFFFF",
+    color: colors.background,
   },
 });

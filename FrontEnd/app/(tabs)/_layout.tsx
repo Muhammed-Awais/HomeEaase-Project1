@@ -9,10 +9,12 @@ import {
 } from "lucide-react-native";
 import { Platform, StyleSheet, View } from "react-native";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function TabLayout() {
   const { colors } = useTheme();
   const styles = createStyles(colors);
+  const { user } = useAuth();
   return (
     <Tabs
       screenOptions={{
@@ -68,6 +70,7 @@ export default function TabLayout() {
         name="chat"
         options={{
           title: "Chat",
+          href: user?.role === "renter" ? "/chat" : null,
           tabBarIcon: ({ color, size }) => (
             <View>
               <MessageCircle size={size} color={color} strokeWidth={1.8} />
