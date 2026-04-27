@@ -18,12 +18,4 @@ export const sendChatMessage = async (
   return response.data;
 };
 
-export const getChatHistory = async (userId: string) => {
-  const response = await api.get(`/chat/history/${userId}`);
-  return response.data;
-};
 
-export const clearChatHistory = async (userId: string) => {
-  const response = await api.delete(`/chat/history/${userId}`);
-  return response.data;
-};
