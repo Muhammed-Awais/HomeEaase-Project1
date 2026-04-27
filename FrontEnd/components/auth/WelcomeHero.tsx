@@ -114,7 +114,7 @@ const createStyles = (colors: any) => StyleSheet.create({
   aiDotText: {
     fontFamily: fonts.bodyBold,
     fontSize: 10,
-    color: "#FFFFFF",
+    color: colors.background,
     letterSpacing: 1,
   },
   title: {

@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "afif-fyp",
-    "slug": "afif-fyp",
+    "name": "HomeEaase-FYP",
+    "slug": "HomeEaase-FYP",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "afiffyp",
+    "scheme": "HomeEaase-FYP",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

@@ -39,10 +39,6 @@ export default function ContactBar({ landlord }: ContactBarProps) {
         >
           <Phone size={18} color={colors.accent} strokeWidth={2} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.messageButton}>
-          <MessageCircle size={18} color="#FFFFFF" strokeWidth={2} />
-          <Text style={styles.messageText}>Message</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
